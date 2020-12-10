@@ -1,10 +1,14 @@
 package bgu.spl.mics.application.services;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import bgu.spl.mics.Future;
 import bgu.spl.mics.MicroService;
+import bgu.spl.mics.application.messages.AttackEvent;
+import bgu.spl.mics.application.messages.BombDestroyerEvent;
+import bgu.spl.mics.application.messages.BroadCastMe;
+import bgu.spl.mics.application.messages.DeactivasionEvent;
 import bgu.spl.mics.application.passiveObjects.Attack;
+
+import java.util.Vector;
 
 /**
  * LeiaMicroservices Initialized with Attack objects, and sends them as  {@link AttackEvents}.
@@ -24,6 +28,40 @@ public class LeiaMicroservice extends MicroService {
 
     @Override
     protected void initialize() {
-    	
+        subscribeBroadcast(BroadCastMe.class, broad->{
+            this.terminate();
+        });
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        Vector<Future> futures= new Vector<>(attacks.length);
+        for (Attack attack : attacks){
+            Future<Boolean> future = sendEvent(new AttackEvent(attack));
+            futures.add(future);
+        }
+        Vector<Object> results= new Vector<>(attacks.length);
+        for (Future future: futures){
+            results.add(future.get());
+        }
+        Future<Boolean> R2D2future = sendEvent(new DeactivasionEvent());
+        while (!R2D2future.isDone()){
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        Future<Boolean> LandoFuture = sendEvent(new BombDestroyerEvent());
+        while (!LandoFuture.isDone()){
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        sendBroadcast(new BroadCastMe());
     }
+
 }
