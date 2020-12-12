@@ -1,5 +1,6 @@
 package bgu.spl.mics;
 
+import bgu.spl.mics.application.passiveObjects.Diary;
 import com.sun.xml.internal.bind.v2.TODO;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -166,7 +167,6 @@ public abstract class MicroService implements Runnable {
                 Message message = messageBus.awaitMessage(this);
                 if (messageQ.containsKey(message.getClass()))
                     messageQ.get(message.getClass()).call(message);
-
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

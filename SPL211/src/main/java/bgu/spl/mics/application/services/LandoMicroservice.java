@@ -3,6 +3,7 @@ package bgu.spl.mics.application.services;
 import bgu.spl.mics.MicroService;
 import bgu.spl.mics.application.messages.BombDestroyerEvent;
 import bgu.spl.mics.application.messages.BroadCastMe;
+import bgu.spl.mics.application.passiveObjects.Diary;
 
 /**
  * LandoMicroservice
@@ -12,10 +13,12 @@ import bgu.spl.mics.application.messages.BroadCastMe;
 public class LandoMicroservice  extends MicroService {
 
     private long duration;
+    private Diary diary;
 
     public LandoMicroservice(long duration) {
         super("Lando");
         this.duration=duration;
+        diary=Diary.getInstance();
     }
 
     @Override
@@ -30,6 +33,7 @@ public class LandoMicroservice  extends MicroService {
        });
         subscribeBroadcast(BroadCastMe.class, broad->{
             this.terminate();
+            diary.setTerminateTime("Lando", System.currentTimeMillis());
         });
     }
 }

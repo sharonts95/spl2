@@ -20,6 +20,42 @@ public class Diary {
     long R2D2Terminate;
     long LandoTerminate;
 
+    public AtomicInteger getNumberOfAttacks() {
+        return totalAttacks;
+    }
+
+    public int getC3POFinish() {
+        return (int) C3POFinis;
+    }
+
+    public int getHanSoloFinish() {
+        return (int) HanSoloFinish;
+    }
+
+    public long getR2D2Deactivate() {
+        return R2D2Deactivate;
+    }
+
+    public long getHanSoloTerminate() {
+        return HanSoloTerminate;
+    }
+
+    public long getC3POTerminate() {
+        return C3POTerminate;
+    }
+
+    public long getLandoTerminate() {
+        return LandoTerminate;
+    }
+
+    public long getR2D2Terminate() {
+        return R2D2Terminate;
+    }
+
+    public void resetNumberAttacks() {
+        totalAttacks.lazySet(0);
+    }
+
     private static class DiaryHolder{
         private static Diary instance=new Diary();
     }
@@ -37,4 +73,30 @@ public class Diary {
     }
 
     public static Diary getInstance(){return DiaryHolder.instance;}
+
+    public void setFinishTime(String name, long time){
+        switch (name){
+            case "Han": HanSoloFinish=time;
+            case "C3PO": C3POFinis=time;
+        }
+    }
+
+    public void setTerminateTime(String name, long time){
+        switch (name){
+            case "Han": HanSoloTerminate=time;
+            case "Leia": LeiaTerminate=time;
+            case "C3PO": C3POTerminate=time;
+            case "R2D2": R2D2Terminate=time;
+            case "Lando": LandoTerminate=time;
+        }
+    }
+
+    public void setR2D2Deactivate(long time){
+        R2D2Deactivate=time;
+    }
+
+    public void setTotalAttacks(){
+        totalAttacks.getAndIncrement();
+    }
+
 }

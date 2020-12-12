@@ -63,12 +63,12 @@ public class MessageBusImpl implements MessageBus {
 	
 	@Override
 	public <T> Future<T> sendEvent(Event<T> e) {
+		synchronized (typeQ) {
 		if(e!=null && typeQ.containsKey(e.getClass()) && !typeQ.get(e.getClass()).isEmpty()){
-			synchronized (typeQ){
 				Future<T> future = new Future<>();
-				MicroService m=typeQ.get(e.getClass()).poll();
-				registerQ.get(m).add(e);
+				MicroService m = typeQ.get(e.getClass()).poll();
 				typeQ.get(e.getClass()).add(m);
+				registerQ.get(m).add(e);
 				futureQ.putIfAbsent(e, future);
 				return future;
 			}
@@ -94,8 +94,12 @@ public class MessageBusImpl implements MessageBus {
 
 	@Override
 	public Message awaitMessage(MicroService m) throws InterruptedException {
-		if (registerQ.containsKey(m))
-			return registerQ.get(m).take();
-		return null;
+		Message message = null;
+		try {
+			message = registerQ.get(m).take();
+		} catch (IllegalStateException e) {
+			e.printStackTrace();
+		}
+		return message;
 	}
 }

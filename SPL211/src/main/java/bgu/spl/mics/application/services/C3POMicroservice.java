@@ -3,6 +3,7 @@ package bgu.spl.mics.application.services;
 import bgu.spl.mics.MicroService;
 import bgu.spl.mics.application.messages.AttackEvent;
 import bgu.spl.mics.application.messages.BroadCastMe;
+import bgu.spl.mics.application.passiveObjects.Diary;
 import bgu.spl.mics.application.passiveObjects.Ewoks;
 
 import java.util.Collections;
@@ -20,10 +21,12 @@ import java.util.List;
 public class C3POMicroservice extends MicroService {
 
     private Ewoks ewoks;
+    Diary diary;
 
-    public C3POMicroservice(Ewoks ewoks) {
+    public C3POMicroservice() {
         super("C3PO");
-        this.ewoks=ewoks;
+        ewoks=Ewoks.getInstance();
+        diary=Diary.getInstance();
     }
 
     @Override
@@ -47,9 +50,12 @@ public class C3POMicroservice extends MicroService {
             }
             ewoks.releaseAll(serials);
             this.complete(event, true);
+            diary.setFinishTime("C3PO", System.currentTimeMillis());
+            diary.setTotalAttacks();
         });
         subscribeBroadcast(BroadCastMe.class, broad->{
             this.terminate();
+            diary.setTerminateTime("C3PO", System.currentTimeMillis());
         });
     }
 }

@@ -7,6 +7,7 @@ import bgu.spl.mics.application.messages.BombDestroyerEvent;
 import bgu.spl.mics.application.messages.BroadCastMe;
 import bgu.spl.mics.application.messages.DeactivasionEvent;
 import bgu.spl.mics.application.passiveObjects.Attack;
+import bgu.spl.mics.application.passiveObjects.Diary;
 
 import java.util.Vector;
 
@@ -20,16 +21,19 @@ import java.util.Vector;
  */
 public class LeiaMicroservice extends MicroService {
 	private Attack[] attacks;
+	private Diary diary;
 	
     public LeiaMicroservice(Attack[] attacks) {
         super("Leia");
 		this.attacks = attacks;
+		diary=Diary.getInstance();
     }
 
     @Override
     protected void initialize() {
         subscribeBroadcast(BroadCastMe.class, broad->{
             this.terminate();
+            diary.setTerminateTime("Leia", System.currentTimeMillis());
         });
         try {
             Thread.sleep(100);

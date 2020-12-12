@@ -1,12 +1,11 @@
 package bgu.spl.mics.application;
 
+import bgu.spl.mics.application.passiveObjects.Diary;
 import bgu.spl.mics.application.passiveObjects.Ewoks;
 import bgu.spl.mics.application.services.*;
 import com.google.gson.Gson;
 
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.Reader;
+import java.io.*;
 
 /** This is the Main class of the application. You should parse the input file,
  * create the different components of the application, and run the system.
@@ -15,13 +14,13 @@ import java.io.Reader;
 public class Main {
 	public static void main(String[] args) throws FileNotFoundException, InterruptedException {
 		Gson gson=new Gson();
-		Reader reader=new FileReader(args[0]);
+		Reader reader=new FileReader("input.json");
 		Input input=gson.fromJson(reader, Input.class);
 
 		Ewoks ewoks=Ewoks.getInstance(input.getEwoks());
 
-		HanSoloMicroservice HanSolo=new HanSoloMicroservice(ewoks);
-		C3POMicroservice C3PO=new C3POMicroservice(ewoks);
+		HanSoloMicroservice HanSolo=new HanSoloMicroservice();
+		C3POMicroservice C3PO=new C3POMicroservice();
 		R2D2Microservice R2D2=new R2D2Microservice(input.getR2D2());
 		LandoMicroservice Lando=new LandoMicroservice(input.getLando());
 		LeiaMicroservice Leia=new LeiaMicroservice(input.getAttacks());
@@ -43,6 +42,12 @@ public class Main {
 		R2D2T.join();
 		LandoT.join();
 		LeiaT.join();
+
+		try (FileWriter writer=new FileWriter("Output.json")){
+			gson.toJson(Diary.getInstance(), writer);
+		}catch (IOException e){
+			e.printStackTrace();
+		}
 
 	}
 }

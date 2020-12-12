@@ -5,6 +5,7 @@ import bgu.spl.mics.Callback;
 import bgu.spl.mics.MicroService;
 import bgu.spl.mics.application.messages.AttackEvent;
 import bgu.spl.mics.application.messages.BroadCastMe;
+import bgu.spl.mics.application.passiveObjects.Diary;
 import bgu.spl.mics.application.passiveObjects.Ewoks;
 
 import java.util.Collections;
@@ -21,12 +22,20 @@ import java.util.List;
 public class HanSoloMicroservice extends MicroService {
 
     private Ewoks ewoks;
+    private Diary diary;
 
-    public HanSoloMicroservice(Ewoks ewoks) {
+    public HanSoloMicroservice(){
         super("Han");
-        this.ewoks=ewoks;
+        ewoks=Ewoks.getInstance();
+        diary=Diary.getInstance();
     }
 
+   /* public HanSoloMicroservice(Ewoks ewoks) {
+        super("Han");
+        this.ewoks=ewoks;
+        diary=Diary.getInstance();
+    }
+*/
 
     @Override
     protected void initialize() {
@@ -49,9 +58,12 @@ public class HanSoloMicroservice extends MicroService {
             }
             ewoks.releaseAll(serials);
             this.complete(event, true);
+            diary.setFinishTime("Han", System.currentTimeMillis());
+            diary.setTotalAttacks();
         });
         subscribeBroadcast(BroadCastMe.class, broad->{
             this.terminate();
+            diary.setTerminateTime("Han", System.currentTimeMillis());
         });
     }
 }
