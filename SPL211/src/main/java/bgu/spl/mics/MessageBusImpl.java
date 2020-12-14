@@ -1,11 +1,9 @@
 package bgu.spl.mics;
 
 import java.util.Map;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * The {@link MessageBusImpl class is the implementation of the MessageBus interface.
@@ -14,8 +12,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class MessageBusImpl implements MessageBus {
 
-	private ConcurrentHashMap<MicroService, LinkedBlockingQueue<Message>> registerQ;// register Q of Microservices
-	private ConcurrentHashMap<Class<? extends Message>, ConcurrentLinkedQueue<MicroService>> typeQ; //
+	private ConcurrentHashMap<MicroService, LinkedBlockingQueue<Message>> registerQ;
+	private ConcurrentHashMap<Class<? extends Message>, ConcurrentLinkedQueue<MicroService>> typeQ;
 	private ConcurrentHashMap<Event, Future> futureQ;
 
 
@@ -25,7 +23,7 @@ public class MessageBusImpl implements MessageBus {
 
 	private MessageBusImpl(){
 		this.registerQ=new ConcurrentHashMap<>();
-		this.typeQ=new ConcurrentHashMap<>();
+		this.typeQ =new ConcurrentHashMap<>();
 		this.futureQ=new ConcurrentHashMap<>();
 	}
 
@@ -36,14 +34,14 @@ public class MessageBusImpl implements MessageBus {
 
 	@Override
 	public <T> void subscribeEvent(Class<? extends Event<T>> type, MicroService m) {
-		typeQ.putIfAbsent(type, new ConcurrentLinkedQueue<MicroService>());
-		typeQ.get(type).add(m);
+			typeQ.putIfAbsent(type, new ConcurrentLinkedQueue<>());
+			typeQ.get(type).add(m);
 	}
 
 	@Override
 	public void subscribeBroadcast(Class<? extends Broadcast> type, MicroService m) {
-		typeQ.putIfAbsent(type, new ConcurrentLinkedQueue<MicroService>());
-		typeQ.get(type).add(m);
+			typeQ.putIfAbsent(type, new ConcurrentLinkedQueue<>());
+			typeQ.get(type).add(m);
     }
 
 	@Override @SuppressWarnings("unchecked")
@@ -54,9 +52,11 @@ public class MessageBusImpl implements MessageBus {
 
 	@Override
 	public void sendBroadcast(Broadcast b) {
-		if(typeQ.get(b.getClass())!=null) {
-			for (MicroService m : typeQ.get(b.getClass()))
-				registerQ.get(m).add(b);
+		synchronized (typeQ) {
+			if (typeQ.get(b.getClass()) != null) {
+				for (MicroService m : typeQ.get(b.getClass()))
+					registerQ.get(m).add(b);
+			}
 		}
 	}
 
@@ -64,12 +64,12 @@ public class MessageBusImpl implements MessageBus {
 	@Override
 	public <T> Future<T> sendEvent(Event<T> e) {
 		synchronized (typeQ) {
-		if(e!=null && typeQ.containsKey(e.getClass()) && !typeQ.get(e.getClass()).isEmpty()){
+			if (e != null && typeQ.containsKey(e.getClass()) && !typeQ.get(e.getClass()).isEmpty()) {
 				Future<T> future = new Future<>();
 				MicroService m = typeQ.get(e.getClass()).poll();
-				typeQ.get(e.getClass()).add(m);
-				registerQ.get(m).add(e);
 				futureQ.putIfAbsent(e, future);
+				registerQ.get(m).add(e);
+				typeQ.get(e.getClass()).add(m);
 				return future;
 			}
 		}
@@ -78,18 +78,19 @@ public class MessageBusImpl implements MessageBus {
 
 	@Override
 	public void register(MicroService m) {
-		registerQ.putIfAbsent(m, new LinkedBlockingQueue<Message>());
+		registerQ.putIfAbsent(m, new LinkedBlockingQueue<>());
 	}
 
 	@Override
 	public void unregister(MicroService m) {
-		synchronized (m){
-			registerQ.remove(m);
-			for(Map.Entry<Class<? extends Message>, ConcurrentLinkedQueue<MicroService>> entry : typeQ.entrySet()){
-				if(entry.getValue().contains(m))
+		synchronized (typeQ) {
+			for (Map.Entry<Class<? extends Message>, ConcurrentLinkedQueue<MicroService>> entry : typeQ.entrySet()) {
+				if (entry.getValue().contains(m))
 					entry.getValue().remove(m);
 			}
+			typeQ.notifyAll();
 		}
+		registerQ.remove(m);
 	}
 
 	@Override

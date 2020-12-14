@@ -20,41 +20,6 @@ public class Diary {
     long R2D2Terminate;
     long LandoTerminate;
 
-    public AtomicInteger getNumberOfAttacks() {
-        return totalAttacks;
-    }
-
-    public int getC3POFinish() {
-        return (int) C3POFinis;
-    }
-
-    public int getHanSoloFinish() {
-        return (int) HanSoloFinish;
-    }
-
-    public long getR2D2Deactivate() {
-        return R2D2Deactivate;
-    }
-
-    public long getHanSoloTerminate() {
-        return HanSoloTerminate;
-    }
-
-    public long getC3POTerminate() {
-        return C3POTerminate;
-    }
-
-    public long getLandoTerminate() {
-        return LandoTerminate;
-    }
-
-    public long getR2D2Terminate() {
-        return R2D2Terminate;
-    }
-
-    public void resetNumberAttacks() {
-        totalAttacks.lazySet(0);
-    }
 
     private static class DiaryHolder{
         private static Diary instance=new Diary();

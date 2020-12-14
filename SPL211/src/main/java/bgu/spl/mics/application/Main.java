@@ -14,7 +14,7 @@ import java.io.*;
 public class Main {
 	public static void main(String[] args) throws FileNotFoundException, InterruptedException {
 		Gson gson=new Gson();
-		Reader reader=new FileReader("input.json");
+		Reader reader=new FileReader(args[0]);
 		Input input=gson.fromJson(reader, Input.class);
 
 		Ewoks ewoks=Ewoks.getInstance(input.getEwoks());
@@ -43,7 +43,7 @@ public class Main {
 		LandoT.join();
 		LeiaT.join();
 
-		try (FileWriter writer=new FileWriter("Output.json")){
+		try (FileWriter writer=new FileWriter(args[1])){
 			gson.toJson(Diary.getInstance(), writer);
 		}catch (IOException e){
 			e.printStackTrace();

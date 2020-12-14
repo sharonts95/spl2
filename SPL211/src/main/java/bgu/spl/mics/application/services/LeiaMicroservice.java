@@ -45,26 +45,13 @@ public class LeiaMicroservice extends MicroService {
             Future<Boolean> future = sendEvent(new AttackEvent(attack));
             futures.add(future);
         }
-        Vector<Object> results= new Vector<>(attacks.length);
         for (Future future: futures){
-            results.add(future.get());
+            future.get();
         }
         Future<Boolean> R2D2future = sendEvent(new DeactivasionEvent());
-        while (!R2D2future.isDone()){
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
+        R2D2future.get();
         Future<Boolean> LandoFuture = sendEvent(new BombDestroyerEvent());
-        while (!LandoFuture.isDone()){
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
+        LandoFuture.get();
         sendBroadcast(new BroadCastMe());
     }
 

@@ -30,13 +30,6 @@ public class HanSoloMicroservice extends MicroService {
         diary=Diary.getInstance();
     }
 
-   /* public HanSoloMicroservice(Ewoks ewoks) {
-        super("Han");
-        this.ewoks=ewoks;
-        diary=Diary.getInstance();
-    }
-*/
-
     @Override
     protected void initialize() {
         subscribeEvent(AttackEvent.class, event -> {

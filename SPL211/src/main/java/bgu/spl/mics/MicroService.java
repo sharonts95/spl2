@@ -165,7 +165,7 @@ public abstract class MicroService implements Runnable {
         while (!terminated) {
             try {
                 Message message = messageBus.awaitMessage(this);
-                if (messageQ.containsKey(message.getClass()))
+                if (message!=null && messageQ.containsKey(message.getClass()))
                     messageQ.get(message.getClass()).call(message);
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -173,5 +173,4 @@ public abstract class MicroService implements Runnable {
         }
         messageBus.unregister(this);
     }
-
 }
