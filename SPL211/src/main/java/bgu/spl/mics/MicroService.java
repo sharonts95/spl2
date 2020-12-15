@@ -1,8 +1,5 @@
 package bgu.spl.mics;
 
-import bgu.spl.mics.application.passiveObjects.Diary;
-import com.sun.xml.internal.bind.v2.TODO;
-
 import java.util.concurrent.ConcurrentHashMap;
 
 /**

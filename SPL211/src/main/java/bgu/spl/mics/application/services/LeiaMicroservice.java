@@ -35,23 +35,30 @@ public class LeiaMicroservice extends MicroService {
             this.terminate();
             diary.setTerminateTime("Leia", System.currentTimeMillis());
         });
+        // let all microservices register and subscribe
         try {
             Thread.sleep(100);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
         Vector<Future> futures= new Vector<>(attacks.length);
+        // send all the attacks as AttackEvents
         for (Attack attack : attacks){
             Future<Boolean> future = sendEvent(new AttackEvent(attack));
             futures.add(future);
         }
+        // when this loop finish, Leia knows that HanSolo and 3CPO finish their attacks because get() method wait until the Future object resolved.
         for (Future future: futures){
             future.get();
         }
+        //now Leia can informed R2D2 that he can act by sending him the DeactivasionEvent.
         Future<Boolean> R2D2future = sendEvent(new DeactivasionEvent());
         R2D2future.get();
+        //R2D2 finish his act after get() method ends. now Leia can informed Lando that he can act by sending him the BombDestroyerEvent.
         Future<Boolean> LandoFuture = sendEvent(new BombDestroyerEvent());
         LandoFuture.get();
+        //Lando finish his act after get() method ends.
+        //now all microservices terminate by this broadcast.
         sendBroadcast(new BroadCastMe());
     }
 

@@ -35,7 +35,7 @@ public class C3POMicroservice extends MicroService {
             List<Integer> serials= event.getSer();
             Collections.sort(serials);
             int counter=0;
-            while (counter!=serials.size()){
+            while (counter!=serials.size()){// try to catch the ewoks.
                 for (Integer ser: serials){
                     if (ewoks.getMyEwoks()[ser].isAvailable()) {
                         ewoks.getMyEwoks()[ser].acquire();

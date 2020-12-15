@@ -1,7 +1,6 @@
 package bgu.spl.mics.application.services;
 
 
-import bgu.spl.mics.Callback;
 import bgu.spl.mics.MicroService;
 import bgu.spl.mics.application.messages.AttackEvent;
 import bgu.spl.mics.application.messages.BroadCastMe;
@@ -36,7 +35,7 @@ public class HanSoloMicroservice extends MicroService {
             List<Integer> serials= event.getSer();
             Collections.sort(serials);
             int counter=0;
-            while (counter!=serials.size()){
+            while (counter!=serials.size()){// try to catch the ewoks.
                 for (Integer ser: serials){
                     if (ewoks.getMyEwoks()[ser].isAvailable()) {
                         ewoks.getMyEwoks()[ser].acquire();

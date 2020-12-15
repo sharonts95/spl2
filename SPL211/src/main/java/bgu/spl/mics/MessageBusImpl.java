@@ -12,8 +12,11 @@ import java.util.concurrent.LinkedBlockingQueue;
  */
 public class MessageBusImpl implements MessageBus {
 
+	//each key represented by different microservice and the value is a queue of the messages that this microservice can handle with.
 	private ConcurrentHashMap<MicroService, LinkedBlockingQueue<Message>> registerQ;
+	//each key represented by the class of an event or broadcast and the value is a queue of the microservices that subscribed to it.
 	private ConcurrentHashMap<Class<? extends Message>, ConcurrentLinkedQueue<MicroService>> typeQ;
+	// each key represented by event and the value is the Future object that bond to it.
 	private ConcurrentHashMap<Event, Future> futureQ;
 
 
@@ -69,10 +72,12 @@ public class MessageBusImpl implements MessageBus {
 				MicroService m = typeQ.get(e.getClass()).poll();
 				futureQ.putIfAbsent(e, future);
 				registerQ.get(m).add(e);
+				// implements "round-robin" by polling the microservice from the queue and add it to the end of the queue.
 				typeQ.get(e.getClass()).add(m);
 				return future;
 			}
 		}
+		// when there is no microservice that subscribe to this event.
         return null;
 	}
 
@@ -88,7 +93,6 @@ public class MessageBusImpl implements MessageBus {
 				if (entry.getValue().contains(m))
 					entry.getValue().remove(m);
 			}
-			typeQ.notifyAll();
 		}
 		registerQ.remove(m);
 	}
